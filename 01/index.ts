@@ -21,8 +21,11 @@ function part2(lines: number[]) {
   return part1(groups);
 }
 
-export const readFileAndParseLinesAsNumbers = async (fileName: string) =>
-  (await fs.readFile(path.join(process.cwd(), "01", fileName), "utf-8"))
+export const readFileAndParseLinesAsNumbers = async (
+  fileName: string,
+  folderName = "01"
+) =>
+  (await fs.readFile(path.join(process.cwd(), folderName, fileName), "utf-8"))
     .split("\n")
     .map(Number);
 
