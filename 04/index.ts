@@ -3,8 +3,7 @@ import path from "path";
 
 const readLines = async (fileName: string) =>
   (await fs.readFile(path.resolve("04", fileName), "utf8"))
-    .split("\n")
-    .filter(Boolean);
+    .split("\n");
 
 const example = readLines("example.txt");
 
