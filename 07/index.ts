@@ -14,28 +14,24 @@ const main = async (fileName: string) => {
         (parsedInput[parseInt(matches[i])] || 0) + 1
     }
   }
-  let keys = Object.keys(parsedInput).map(Number)
+  let max = 0
+  let keys = Object.keys(parsedInput).map(
+    (n: number | string) => (
+      (max = Number(n) > max ? Number(n) : max), Number(n)
+    )
+  )
   let lowestMoves: number | null = null
 
-  for (let index = 0; index < Math.max(...keys); index++) {
+  for (let index = 0; index < max; index++) {
     let offsetSum = 0
-    keys
-      .filter((inner_key) => inner_key !== index)
-      .forEach((inner_key) => {
-        let sum = 0
-        let diff = Math.abs(inner_key - index)
-        for (let index = 0; index < diff; index++) {
-          sum += diff - index
-        }
-        sum *= parsedInput[inner_key]
-        offsetSum += sum
-//         console.log(`
-// outer: ${index}
-// inner: ${inner_key}
-// val: ${parsedInput[inner_key]}
-// total: ${offsetSum}
-// `)
-      })
+    keys.forEach((inner_key) => {
+      const diff = Math.abs(inner_key - index)
+      offsetSum += ((diff * (diff + 1)) / 2) * parsedInput[inner_key]
+    })
+    console.log(`
+outer: ${index}
+total: ${offsetSum}
+`)
     lowestMoves =
       lowestMoves === null || offsetSum < lowestMoves ? offsetSum : lowestMoves
   }
