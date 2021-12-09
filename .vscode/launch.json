@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Launch Program",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/05/index.ts",
+      "program": "${workspaceFolder}/06/index.ts",
       "preLaunchTask": "tsc: build",
       "outFiles": ["${workspaceFolder}/dist/**/*.js"]
     }
