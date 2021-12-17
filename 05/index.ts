@@ -6,26 +6,51 @@ const readLines = async (fileName: string) =>
     .split('\n')
     .map((l) => l.split(' -> ').map((s) => s.split(',').map(Number)))
 
+function processPoint(point: string, points: Set<string>, dupes: Set<string>) {
+  if (points.has(point)) {
+    if (!dupes.has(point)) {
+      dupes.add(point)
+      console.log(`dupe: ${point}`)
+    }
+  } else {
+    points.add(point)
+  }
+}
+
 const main = async (fileName: string) => {
-  const points: string[] = []
-  ;(await readLines(fileName))
+  const points = new Set<string>()
+  const dupes = new Set<string>()
+  const data = await readLines(fileName)
+
+  data
     .filter(([[x1, y1], [x2, y2]]) => x1 === x2 || y1 === y2)
     .map(([[x1, y1], [x2, y2]]) => {
       // console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
       const diffX = Math.abs(x2 - x1)
       const diffY = Math.abs(y2 - y1)
 
-      points.push([x1, y1].join(','))
+      // points.push([x1, y1].join(','))
+      // points.push([x2, y2].join(','))
+
       if (diffX !== 0) {
-        for (let i = 1; i < diffX; i++) {
-          points.push([x1 < x2 ? x1 + i : x2 + i, y1].join(','))
+        let x_1 = x1 < x2 ? x1 : x2
+        let x_2 = x1 < x2 ? x2 : x1
+        for (let i = 0; i < diffX; i++) {
+          let point = [x_1 + i, y1].join(',')
+          processPoint(point, points, dupes)
         }
+        let point = [x_2, y1].join(',')
+        processPoint(point, points, dupes)
       }
-      points.push([x2, y2].join(','))
       if (diffY !== 0) {
-        for (let i = 1; i < diffY; i++) {
-          points.push([x1, y1 < y2 ? y1 + i : y2 + i].join(','))
+        let y_1 = y1 < y2 ? y1 : y2
+        let y_2 = y1 < y2 ? y2 : y1
+        for (let i = 0; i < diffY; i++) {
+          let point = [x1, y_1 + i].join(',')
+          processPoint(point, points, dupes)
         }
+        let point = [x1, y_2].join(',')
+        processPoint(point, points, dupes)
       }
 
       return [
@@ -33,8 +58,7 @@ const main = async (fileName: string) => {
         [x2, y2],
       ]
     })
-  const duplicates = new Set(points)
-  return points.length - duplicates.size
+  return dupes.size
 }
 
 await main('example.txt').then(console.log)
