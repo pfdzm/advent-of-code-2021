@@ -10,14 +10,13 @@ function processPoint(point: string, points: Set<string>, dupes: Set<string>) {
   if (points.has(point)) {
     if (!dupes.has(point)) {
       dupes.add(point)
-      console.log(`dupe: ${point}`)
     }
   } else {
     points.add(point)
   }
 }
 
-const main = async (fileName: string) => {
+const part1 = async (fileName: string) => {
   const points = new Set<string>()
   const dupes = new Set<string>()
   const data = await readLines(fileName)
@@ -25,13 +24,8 @@ const main = async (fileName: string) => {
   data
     .filter(([[x1, y1], [x2, y2]]) => x1 === x2 || y1 === y2)
     .map(([[x1, y1], [x2, y2]]) => {
-      // console.log(`x1: ${x1}, y1: ${y1}, x2: ${x2}, y2: ${y2}`)
       const diffX = Math.abs(x2 - x1)
       const diffY = Math.abs(y2 - y1)
-
-      // points.push([x1, y1].join(','))
-      // points.push([x2, y2].join(','))
-
       if (diffX !== 0) {
         let x_1 = x1 < x2 ? x1 : x2
         let x_2 = x1 < x2 ? x2 : x1
@@ -58,8 +52,63 @@ const main = async (fileName: string) => {
         [x2, y2],
       ]
     })
+  return { points, dupes }
+}
+
+const part2 = async (fileName: string) => {
+  const data = await readLines(fileName)
+
+  const { points, dupes } = await part1(fileName)
+
+  data
+  .filter(([[x1, y1], [x2, y2]]) => !(x1 === x2 || y1 === y2))
+  .map(([[x1, y1], [x2, y2]]) => {
+    const dX = Math.abs(x2 - x1)
+    const dY = Math.abs(y2 - y1)
+    const isDiagonal = dX === dY && dX !== 0 && dY !== 0
+    const isAscending = (x1 > x2 && y1 > y2) || (x1 < x2 && y1 < y2)
+
+    if (isDiagonal) {
+      let x_1 = x1 < x2 ? x1 : x2
+      let y_1 = y1 < y2 ? y1 : y2
+      let delta = dX
+      if (isAscending) {
+        for (let i = 0; i <= delta; i++) {
+          let point = [x_1 + i, y_1 + i].join(',')
+          processPoint(point, points, dupes)
+        }
+      } else {
+        if (x1 < x2) {
+          for (let i = 0; i <= delta; i++) {
+            let point = [x1 + i, y1 - i].join(',')
+            processPoint(point, points, dupes)
+          }
+        } else {
+          for (let i = 0; i <= delta; i++) {
+            let point = [x1 - i, y1 + i].join(',')
+            processPoint(point, points, dupes)
+          }
+        }
+      }
+    }
+
+    return [
+      [x1, y1],
+      [x2, y2],
+    ]
+  })
+  return { points, dupes }
+}
+
+type Result = { points: Set<string>; dupes: Set<string> }
+
+const run = async (result: Promise<Result>): Promise<number> => {
+  const { dupes } = await result
+  console.log(dupes.size)
   return dupes.size
 }
 
-await main('example.txt').then(console.log)
-await main('input.txt').then(console.log)
+run(part1('example.txt'))
+run(part1('input.txt'))
+run(part2('example.txt'))
+run(part2('input.txt'))
