@@ -1,11 +1,7 @@
-import fs from 'fs/promises'
-import path from 'path'
-
-const readLines = async (fileName: string): Promise<string> =>
-  await fs.readFile(path.resolve('07', fileName), 'utf8')
+import { readLines } from '../lib/readLines.js'
 
 const main = async (fileName: string) => {
-  const input = await readLines(fileName)
+  const input = await readLines('07', fileName)
   let parsedInput: Record<number, number> = {}
   let matches = input.match(new RegExp(`\\b\\d\+\\b`, 'g'))
   if (matches !== null) {
