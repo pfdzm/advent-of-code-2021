@@ -1,39 +1,44 @@
-import fs from 'fs/promises'
-import path from 'path'
+import { readLines } from '../lib/readLines.js'
 
-const readLines = async (fileName: string): Promise<string> =>
-  await fs.readFile(path.resolve('08', fileName), 'utf8')
+const example1 = await readLines('08', 'example.txt')
+const input1 = await readLines('08', 'input.txt')
 
-const main = async (fileName: string) => {
-  const input = (await readLines(fileName))
+function part1(input: string): number {
+  const lines = input
     .split('\n')
-    .map((line) => line.split('').map(Number))
+    .filter(Boolean)
+    .map((line) => line.split('|'))
 
-    let risk_level = 0
-  for (let y = 0; y < input.length; y++) {
-    for (let x = 0; x < input[y].length; x++) {
-      const cell = input[y][x]
+  let signals: Record<number, number> = {}
 
-      const neighbors = [
-        x === 0 ? Number.MAX_SAFE_INTEGER : input[y][x - 1],
-        x === input[y].length - 1 ? Number.MAX_SAFE_INTEGER : input[y][x + 1],
-        y === 0 ? Number.MAX_SAFE_INTEGER : input[y - 1][x],
-        y === input.length - 1 ? Number.MAX_SAFE_INTEGER : input[y + 1][x],
-        // input[y - 1][x - 1],
-        // input[y - 1][x + 1],
-        // input[y + 1][x - 1],
-        // input[y + 1][x + 1],
-      ]
-
-      const isMinimum = neighbors.every((n) => n > cell)
-      if (isMinimum) {
-        risk_level += cell + 1
+  for (const line of lines) {
+    let [signalPatterns, outputValue]: (string | string[])[] = line
+    signalPatterns = signalPatterns.split(' ').filter(Boolean)
+    outputValue = outputValue.split(' ').filter(Boolean)
+    outputValue.map((val) => {
+      switch (val.length) {
+        case 2:
+          signals[1] = (signals[1] || 0) + 1
+          break
+        case 4:
+          signals[4] = (signals[4] || 0) + 1
+          break
+        case 3:
+          signals[7] = (signals[7] || 0) + 1
+          break
+        case 7:
+          signals[8] = (signals[8] || 0) + 1
+          break
       }
-      // console.log(`${y} ${x} ${cell} ${neighbors} ${isMinimum}`)
-    }
+    })
   }
-  return risk_level
+  return Object.values(signals).reduce((a, b) => a + b, 0)
 }
 
-await main('example.txt').then((d) => console.log(d))
-await main('input.txt').then((d) => console.log(d))
+// 1 -> 2 signals
+// 4 -> 4 signals
+// 7 -> 3 signals
+// 8 -> 7 signals
+
+console.log(JSON.stringify(part1(example1), null, 2))
+console.log(JSON.stringify(part1(input1), null, 2))
